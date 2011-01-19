@@ -378,15 +378,6 @@ public class Parser {
 		return (lex.match("var"));
 	}
 
-	private boolean isNameDeclaration() {
-		return (lex.isIdentifier());
-	}
-
-	private boolean isStatement() {
-		return (isReturnStatement() || isIfStatement() || isWhileStatement()
-				|| isCompoundStatement() || isAssignOrFunction());
-	}
-
 	private boolean isReturnStatement() {
 		return (lex.match("return"));
 	}
