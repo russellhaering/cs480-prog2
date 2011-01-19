@@ -630,39 +630,42 @@ public class Parser {
 		return(lex.match("class"));
 	}
 
-
 	private boolean isNonClassDeclaration()
 	{
 		return(isFunctionDeclaration() || isNonFunctionDeclaration());
 	}
 
-	// boolean isNonClassDeclaration(){ return !lex.match("begin"); }
-
 	private boolean isFunctionDeclaration()
 	{
 		return(lex.match("function"));
 	}
+
 	private boolean isNonFunctionDeclaration()
 	{
 		return(lex.match("var") || lex.match("const") || lex.match("type"));
 	}
+
 	private boolean isConstantDeclaration()
 	{
 		return(lex.match("const"));
 	}
+
 	private boolean isTypeDeclaration()
 	{
 		return(lex.match("type"));
 	}
+
 	private boolean isVariableDeclaration()
 	{
 		return(lex.match("var"));
 	}
+
 	private boolean isStatement()
 	{
 		return( isReturnStatement() || isIfStatement() || isWhileStatement()
 				|| isCompoundStatement() || isAssignOrFunction() );
 	}
+
 	private boolean isReturnStatement()
 	{
 		return(lex.match("return"));
@@ -698,6 +701,7 @@ public class Parser {
 	{
 		return(lex.isIdentifier());
 	}
+
 	private boolean isConstant()
 	{
 		return (lex.tokenCategory() == 3 || lex.tokenCategory() == 4
@@ -719,9 +723,9 @@ public class Parser {
 	{
 		return (lex.match("+") || lex.match("-") || lex.match("<<") );
 	}
+
 	private boolean isMultiplicationOperator()
 	{
 		return (lex.match("*") || lex.match("/") || lex.match("%") );
 	}
-
 }
