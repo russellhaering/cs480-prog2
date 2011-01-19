@@ -1,15 +1,19 @@
 #!/bin/bash
 
-cd data
+if [ ! -d "out" ]
+then
+	mkdir out
+fi
 
-for file in $(ls . | grep -v "\.s$")
+for file in $(ls data | grep -v "\.s$")
 do
+	echo "===== TESTING FILE: ${file} ====="
+
 	# Generate our output
-	java -cp ../bin Asgn2 "${file}" > "${file}.s.ours"
+	java -cp bin Asgn2 "data/${file}" > "out/${file}.s"
 
 	# Diff the two
-	diff "${file}.s.ours" "${file}.s"
-
-	# Clean up
-	rm "${file}.s.ours"
+	colordiff -u "out/${file}.s" "data/${file}.s"
 done
+
+#rm -rf out

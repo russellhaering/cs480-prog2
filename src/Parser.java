@@ -127,27 +127,28 @@ public class Parser {
 	private boolean variableDeclaration() throws ParseException
 	{
 		start("variableDeclaration");
-		if(lex.match("var"))
-			lex.nextLex();
-		else
+
+		if (!lex.match("var"))
 			throw new ParseException(15);
+		lex.nextLex();
+
+		nameDeclaration();
 
 		stop("variableDeclaration");
-		return nameDeclaration();
+		return true;
 	}
 
 	private boolean nameDeclaration() throws ParseException
 	{
 		start("nameDeclaration");
-		if(lex.isIdentifier())
-			lex.nextLex();
-		else
-			throw new ParseException(32);
 
-		if(lex.match(":"))
-			lex.nextLex();
-		else
+		if (!lex.isIdentifier())
+			throw new ParseException(32);
+		lex.nextLex();
+
+		if (!lex.match(":"))
 			throw new ParseException(19);
+		lex.nextLex();
 
 		type();
 
@@ -278,10 +279,8 @@ public class Parser {
 	{
 		start("type");
 
-
-		if(lex.isIdentifier())
-		{
-			stop("type");
+		if (lex.isIdentifier()) {
+			lex.nextLex();
 		}
 		else if(lex.match("^"))
 		{
@@ -305,6 +304,7 @@ public class Parser {
 		}
 		else
 			throw new ParseException(30);
+
 		stop("type");
 		return true;
 	}
@@ -359,7 +359,7 @@ public class Parser {
 		else if(lex.match("begin"))
 			compoundStatement();
 		else
-			reference();
+			assignOrFunction();
 
 		stop("statement");
 		return true;
@@ -387,27 +387,23 @@ public class Parser {
 	private boolean ifStatement() throws ParseException
 	{
 		start("ifStatement");
-		if(lex.match("if"))
-			lex.nextLex();
-		else
+		if (!lex.match("if"))
 			throw new ParseException(11);
-		if(lex.match("("))
-		{
-			lex.nextLex();
-			expression();
-			if(lex.match(")"))
-				lex.nextLex();
-			else
-				throw new ParseException(22);
-		}
-		else
-			throw new ParseException(21);
+
+		lex.nextLex();
+		expression();
+
+		if (!lex.match("then"))
+			throw new ParseException(13);
+
+		lex.nextLex();
 		statement();
-		if(lex.match("else"))
-		{
+
+		if (lex.match("else")) {
 			lex.nextLex();
 			statement();
 		}
+
 		stop("ifStatement");
 		return true;
 	}
@@ -415,19 +411,17 @@ public class Parser {
 	private boolean whileStatement() throws ParseException
 	{
 		start("whileStatement");
-		if(lex.match("while"))
-			lex.nextLex();
-		else
+
+		if (!lex.match("while"))
 			throw new ParseException(16);
-		if(lex.match("("))
-			lex.nextLex();
-		else
-			throw new ParseException(21);
+		lex.nextLex();
+
 		expression();
-		if(lex.match(")"))
-			lex.nextLex();
-		else
-			throw new ParseException(22);
+
+		if (!lex.match("do"))
+			throw new ParseException(7);
+		lex.nextLex();
+
 		statement();
 		stop("whileStatement");
 		return true;
@@ -460,10 +454,8 @@ public class Parser {
 		start("parameterList");
 		if(lex.match("(")||lex.match("not")||lex.match("new")||lex.match("-")||lex.match("&")||lex.tokenCategory() != 6||lex.tokenCategory() != 7||lex.tokenCategory() != 2)
 		{
-			lex.nextLex();
 			expression();
-			while(lex.match(",")&&lex.tokenCategory() != 7)
-			{
+			while (lex.match(",") && lex.tokenCategory() != 7) {
 				lex.nextLex();
 				expression();
 			}
@@ -574,33 +566,23 @@ public class Parser {
 	private boolean reference() throws ParseException
 	{
 		start("reference");
-		if(lex.tokenCategory() == 1)
+		if (lex.isIdentifier())
 			lex.nextLex();
-		else
-		{
-			while (lex.match("^") || lex.match(".") || lex.match("[")
-					&& lex.tokenCategory() != 7)
-			{
-				if (lex.match("^"))
-				{
+		else {
+			while (lex.match("^") || lex.match(".") || lex.match("[")) {
+				if (lex.match("^")) {
 					lex.nextLex();
-				}
-				else if(lex.match("."))
-				{
+				} else if (lex.match(".")) {
 					lex.nextLex();
-					if(lex.tokenCategory() == 1)
-						lex.nextLex();
-					else
+					if (lex.tokenCategory() != 1)
 						throw new ParseException(27);
-				}
-				else if(lex.match("["))
-				{
+					lex.nextLex();
+				} else if (lex.match("[")) {
 					lex.nextLex();
 					expression();
-					if(lex.match("]"))
-						lex.nextLex();
-					else
+					if (!lex.match("]"))
 						throw new ParseException(24);
+					lex.nextLex();
 				}
 			}
 		}
