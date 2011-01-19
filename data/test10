@@ -1,0 +1,5 @@
+function main ()
+begin
+	if a == b then c = d;
+end;
+
