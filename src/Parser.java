@@ -13,7 +13,7 @@ public class Parser {
 	public void parse () throws ParseException {
 		lex.nextLex();
 		program();
-		if (lex.tokenCategory() != lex.endOfInput)
+		if (lex.tokenCategory() != Lexer.endOfInput)
 			parseError(3); // expecting end of file
 	}
 
@@ -657,10 +657,6 @@ public class Parser {
 	private boolean isVariableDeclaration()
 	{
 		return(lex.match("var"));
-	}
-	private boolean isNameDeclaration()
-	{
-		return(lex.isIdentifier());
 	}
 	private boolean isStatement()
 	{
