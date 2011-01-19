@@ -205,12 +205,12 @@ public class Parser {
 	{
 		start("functionDeclaration");
 
-		if(lex.match("function"))
+		if (lex.match("function"))
 			lex.nextLex();
 		else
 			throw new ParseException(10);
 
-		if(lex.isIdentifier())
+		if (lex.isIdentifier())
 			lex.nextLex();
 		else
 			throw new ParseException(27);
@@ -309,7 +309,7 @@ public class Parser {
 	{
 		start("functionBody");
 
-		while(isNonClassDeclaration())
+		while (!lex.match("begin"))
 		{
 			nonClassDeclaration();
 			if (lex.match(";"))
@@ -467,15 +467,14 @@ public class Parser {
 	{
 		start("parameterList");
 
-		while(isExpression())
-		{
+		if (isExpression())
 			expression();
-			if(lex.match(")") || lex.match(";"))	// end of expression list
-				break;
-			else if(lex.match(","))
-				lex.nextLex();	// keep going
-			else				// error
+
+		while (lex.match(",")) {
+			lex.nextLex();
+			if (!isExpression())
 				throw new ParseException(22);
+			expression();
 		}
 
 		stop("parameterList");
@@ -487,7 +486,7 @@ public class Parser {
 		start("expression");
 
 		relExpression();
-		while(isLogicalOperator()) // logical operators
+		while (isLogicalOperator()) // logical operators
 		{
 			lex.nextLex();
 			relExpression();
@@ -595,30 +594,31 @@ public class Parser {
 	{
 		start("reference");
 
-		if(!isReference())
+		if (!lex.isIdentifier())
 			throw new ParseException(27);
-
 		lex.nextLex();
 
-		if(lex.match("."))
+		while (lex.match("^") || lex.match(".") || lex.match("["))
 		{
-			lex.nextLex();
-			if(!lex.isIdentifier())
-				throw new ParseException(27);
-			else
+			if(lex.match("^"))
+			{
 				lex.nextLex();
-		}
-		else if(lex.match("["))
-		{
-			lex.nextLex();
-			expression();
-			if(!lex.match("]"))
-				throw new ParseException(24);
-			else
+			}
+			else if(lex.match("."))
+			{
 				lex.nextLex();
-		}
-		else if(!lex.match("^"))
-		{
+				if (!lex.isIdentifier())
+					throw new ParseException(27);
+				lex.nextLex();
+			}
+			else if(lex.match("["))
+			{
+				lex.nextLex();
+				expression();
+				if (!lex.match("]"))
+					throw new ParseException(24);
+				lex.nextLex();
+			}
 		}
 
 		stop("reference");
